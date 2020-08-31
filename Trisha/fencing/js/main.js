@@ -105,7 +105,7 @@ function signup()
     }
     if(contact.length != 10)
     {
-        return alert("Enter valid contact Number");
+        return alert("Enter valid contact Number of 10 digits");
     }
     if(password.length < 3 || confirmPass.length < 3)
     {
@@ -128,7 +128,8 @@ function signup()
         };
         
         $.ajax(settings).done(function (response) {
-            console.log("Data insert " + response);
+            //console.log("Data insert " + response);
+            return alert ("You Registered Sucessfully!! Now you can Sign in");
         }); 
         $(document).ajaxStop(function(){
             window.location.reload();
@@ -172,3 +173,87 @@ function signin()
     }
 }
 
+//Reset-Password
+document.getElementById("varificationSection").style.display = "none";
+document.getElementById("passwordSection1").style.display = "none";
+document.getElementById("passwordSection2").style.display = "none";
+document.getElementById("passwordSection3").style.display = "none";
+
+function sendmail()
+{
+    var email = document.getElementById("email").value; 
+    if(email == "")
+    {
+        return alert("Enter Values in the field");
+    }
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if(!valid)
+    {
+        alert("Enter valid Email");
+    }
+    else
+    {
+        var settings = {
+            "url": "http://localhost:3000/sendmail",
+            "method": "POST",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "data": JSON.stringify({"email": email}),
+          };
+          
+          $.ajax(settings).done(function (response) {
+            return alert (response);
+          });
+          document.getElementById("varificationSection").style.display = "block";  
+          document.getElementById("passwordSection1").style.display = "block"; 
+          document.getElementById("passwordSection2").style.display = "block"; 
+          document.getElementById("passwordSection3").style.display = "block";       
+    }
+}
+
+function resetSignin()
+{
+    var email = document.getElementById("email").value; 
+    var password = document.getElementById("password").value; 
+    var confirmPass = document.getElementById("confirmPass").value; 
+    var varifyCode = document.getElementById("varificationcode").value; 
+
+    if (email == "" || password == "" || confirmPass == "" || varifyCode == "")
+    {
+        return alert("Enter Values in the fields");
+    }
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if(!valid)
+    {
+        alert("Enter valid Email");
+    }
+    if(password.length < 3 || confirmPass.length < 3)
+    {
+        return alert("Password should be 3 minimum Characters");
+    }
+    if(password != confirmPass)
+    {
+        return alert("Your password did not match");
+    }
+    else
+    {
+        var settings = {
+            "url": "http://localhost:3000/resetpassword",
+            "method": "POST",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "data": JSON.stringify({"password":password,"confirm_pass":confirmPass,"email":email,"varifyCode":varifyCode}),
+          };
+          
+          $.ajax(settings).done(function (response) {
+            return alert (response);
+          });
+        //   $(document).ajaxStop(function(){
+        //     window.location.reload();
+        // });
+    }
+}
