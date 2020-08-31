@@ -202,7 +202,7 @@ iframe {
 [ Login100 more ]*/
 .login100-more {
   background-repeat: no-repeat;
-  background-position: center;
+  /* background-position: center; */
   background-size: cover;
   width: calc(100% - 520px);
   position: relative;
@@ -218,11 +218,11 @@ iframe {
   height: 100%;
   top: 0;
   left: 0;
-  background: #e8519e;
+  /* background: #e8519e;
   background: -webkit-linear-gradient(bottom, #e8519e, #c77ff2);
   background: -o-linear-gradient(bottom, #e8519e, #c77ff2);
   background: -moz-linear-gradient(bottom, #e8519e, #c77ff2);
-  background: linear-gradient(bottom, #e8519e, #c77ff2);
+  background: linear-gradient(bottom, #e8519e, #c77ff2); */
   opacity: 0.8;
 }
 
