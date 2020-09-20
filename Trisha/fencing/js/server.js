@@ -4,7 +4,9 @@ const bodyparser = require('body-parser');
 const mysql = require('mysql');
 const cors = require('cors');
 const app = express();
-const emailSvc = require('./services/email') 
+const emailSvc = require('./services/email'); 
+const { realpathSync } = require('fs');
+const appoirtmentEmailSvc = require('./services/appoirtment'); 
 
 app.use(bodyparser.urlencoded({extended : true}));
 app.use(bodyparser.json());
@@ -242,6 +244,78 @@ app.post('/resetpassword', (req,res) => {
     }); //query reset
   }); //query email end
 }); //route end
+
+//Book Appoirtment
+app.post('/appoirtment',(req, res) => {
+    const name = req.body.name;
+    const email = req.body.email;
+    const date = req.body.date;
+    const time = req.body.time;
+    const TT = req.body.TT;
+
+    //Validation for email
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if (!email || email.length>254 || !valid)
+    {
+        res.status(400).send('Enter Valid email address');
+        return;
+    }
+
+    //validation for Name
+    if(!name|| name.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('Name is required');   
+    }
+
+    //validation for date
+    if(!date|| date.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('Date is required');    
+    }
+
+    //validation for time
+    if(!time|| time.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('Time is required');
+    }
+
+    let sqlDateTime = `SELECT * from Book WHERE Date = "${date}" AND Time = "${time}"`;
+
+    let queryDateTime = db.query(sqlDateTime,(err, result) => {
+        if(err  || result.length > 0)
+        {
+           return res.send("Please Book Appoirtment on another day or time.");
+        } 
+    });
+    
+    let sql = `INSERT INTO Book (Name, Email, Date, Time, TT) VALUES ("${name}", "${email}", "${date}", "${time}", "${TT}")`;
+
+    let query = db.query(sql,(err, result) => {
+        if(err) throw err;
+        console.log(result);
+        //return res.send('Appoirtment Book Sucessfully.')
+    });
+
+    let sqlBook = `SELECT * FROM BOOK WHERE Email = "${email}"`;
+    let queryBook = db.query(sqlBook,(err, result) => {
+        if(err) throw err;
+        console.log(result);
+        //return res.send('Appoirtment Book Sucessfully.')
+
+    //mail handling
+    const userObj = result[0];
+    const emailOptions = {email : userObj.Email, name: userObj.Name , date: userObj.Date , time: userObj.Time , TT: userObj.TT , subject : 'Appoirtment Booking'}
+    appoirtmentEmailSvc(emailOptions).then((sucess) => {
+        return res.send('Your Appoirtment is booked sucessfully.');
+    }).catch((err) => {
+        return res.status(500).send({"Error": err})
+    })         
+});
+});
 
 app.listen('3000',()=>{
     console.log("Server started on port 3000...")
