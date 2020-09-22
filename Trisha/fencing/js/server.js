@@ -246,7 +246,7 @@ app.post('/resetpassword', (req,res) => {
 }); //route end
 
 //Book Appoirtment
-app.post('/appoirtment',(req, res) => {
+app.post('/appoirtment', async (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
     const date = req.body.date;
@@ -284,37 +284,37 @@ app.post('/appoirtment',(req, res) => {
     }
 
     let sqlDateTime = `SELECT * from Book WHERE Date = "${date}" AND Time = "${time}"`;
+    let occupied = false;
 
-    let queryDateTime = db.query(sqlDateTime,(err, result) => {
-        if(err  || result.length > 0)
-        {
-           return res.send("Please Book Appoirtment on another day or time.");
-        } 
+    let queryDateTime = db.query(sqlDateTime, (err, result) => {
+        if (err || result.length > 0) {
+            return res.send("Please Select Another Date or Time");
+        } else {
+            let sql = `INSERT INTO Book (Name, Email, Date, Time, TT) VALUES ("${name}", "${email}", "${date}", "${time}", "${TT}")`;
+            let query = db.query(sql,(err, result) => {
+                if(err) throw err;
+                console.log(result);
+                //return res.send('Appoirtment Book Sucessfully.')
+            });
+        
+            let sqlBook = `SELECT * FROM BOOK WHERE Email = "${email}" AND Name = "${name}"`;
+            let queryBook = db.query(sqlBook,(err, result) => {
+                if(err) throw err;
+                console.log(result);
+        
+            //mail handling
+            //const userObj = result[0];
+            // const emailOptions = {email : userObj.Email, name: userObj.Name , date: userObj.Date , time: userObj.Time , TT: userObj.TT , subject : 'Appoirtment Booking'}
+            const emailOptions = {email : email, name: name , date: date, time: time , TT: TT , subject : 'Appoirtment Booking'}
+            appoirtmentEmailSvc(emailOptions).then((sucess) => {
+                return res.send('Your Appoirtment is booked sucessfully.');
+            }).catch((err) => {
+                return res.status(500).send({"Error": err})
+            })         
+        });
+        }  
     });
-    
-    let sql = `INSERT INTO Book (Name, Email, Date, Time, TT) VALUES ("${name}", "${email}", "${date}", "${time}", "${TT}")`;
-
-    let query = db.query(sql,(err, result) => {
-        if(err) throw err;
-        console.log(result);
-        //return res.send('Appoirtment Book Sucessfully.')
-    });
-
-    let sqlBook = `SELECT * FROM BOOK WHERE Email = "${email}"`;
-    let queryBook = db.query(sqlBook,(err, result) => {
-        if(err) throw err;
-        console.log(result);
-        //return res.send('Appoirtment Book Sucessfully.')
-
-    //mail handling
-    const userObj = result[0];
-    const emailOptions = {email : userObj.Email, name: userObj.Name , date: userObj.Date , time: userObj.Time , TT: userObj.TT , subject : 'Appoirtment Booking'}
-    appoirtmentEmailSvc(emailOptions).then((sucess) => {
-        return res.send('Your Appoirtment is booked sucessfully.');
-    }).catch((err) => {
-        return res.status(500).send({"Error": err})
-    })         
-});
+        
 });
 
 app.listen('3000',()=>{
