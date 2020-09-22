@@ -83,6 +83,7 @@
 
 })(jQuery);
 
+
 //Start code
 //Sign Up 
 function signup()
@@ -256,4 +257,45 @@ function resetSignin()
         //     window.location.reload();
         // });
     }
+}
+
+// Book Appointment
+function book()
+{
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var date = document.getElementById("date").value;
+    var time = document.getElementById("time").value;
+    var tt = document.getElementById("tt").value;
+
+    if(name == "" || email == "" || date == "" || time == "" || tt == "")
+    {
+       return alert("Enter Values in the field");
+    }
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if(!valid)
+    {
+       return alert("Enter valid Email");
+    }
+    
+    else
+    {
+        var settings = {
+            "url": "http://localhost:3000/appoirtment",
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "data": JSON.stringify({"name":name,"email":email,"date":date,"time":time,"TT":tt}),
+          };
+          
+          $.ajax(settings).done(function (response) {
+            alert (response);
+            window.location.reload();
+            return;
+          });
+    }
+
 }
