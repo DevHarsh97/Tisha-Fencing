@@ -259,6 +259,24 @@ function resetSignin()
     }
 }
 
+//Time onchange function
+
+function timeonchange(value)
+{
+    //console.log(value);
+    if(value == "9:00" || value == "10:00" || value == "11:00")
+    {
+        document.getElementById("tt").options[1].disabled = false;
+        document.getElementById("tt").options[2].disabled = true;
+    }
+    else
+    {
+        document.getElementById("tt").options[1].disabled = true;
+        document.getElementById("tt").options[2].disabled = false;
+    }  
+}
+
+
 // Book Appointment
 function book()
 {
@@ -268,7 +286,7 @@ function book()
     var time = document.getElementById("time").value;
     var tt = document.getElementById("tt").value;
 
-    if(name == "" || email == "" || date == "" || time == "" || tt == "")
+    if(name == "" || email == "" || date == "" || time == "" || tt == "" || time == "--" || tt == "--")
     {
        return alert("Enter Values in the field");
     }
@@ -277,6 +295,21 @@ function book()
     if(!valid)
     {
        return alert("Enter valid Email");
+    }
+    if(time == "9:00" || time == "10:00" || time == "11:00")
+    {
+        if(tt != "AM")
+        {
+            return alert("Select AM in AM/PM field");
+        }
+    }
+
+    if(time == "12:00" || time == "1:00" || time == "2:00" || time == "3:00" || time == "4:00")
+    {
+        if(tt != "PM")
+        {
+            return alert("Select PM in AM/PM field");
+        }
     }
     
     else
@@ -298,4 +331,38 @@ function book()
           });
     }
 
+}
+
+//change Availability
+function change()
+{
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var date = document.getElementById("date").value;
+    if(name == "" || email == "" || date == "")
+    {
+       return alert("Enter Values in the field");
+    }
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if(!valid)
+    {
+       return alert("Enter valid Email");
+    }
+
+    var settings = {
+        "url": "http://localhost:3000/Changeavailability",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "data": JSON.stringify({"name":name,"email":email,"date":date}),
+      };
+      
+      $.ajax(settings).done(function (response) {
+        alert (response);
+        window.location.reload();
+        return;
+      });
 }
