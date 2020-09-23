@@ -317,6 +317,45 @@ app.post('/appoirtment', async (req, res) => {
         
 });
 
+//Change availablity
+app.post('/Changeavailability', (req,res) => {
+    const date = req.body.date;
+    const name = req.body.name;
+    const email = req.body.email;
+    //console.log(req.body);
+
+    //Validation for email
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if (!email || email.length>254 || !valid)
+    {
+        res.status(400).send('Enter Valid email address');
+        return;
+    }
+
+    //validation for Name
+    if(!name|| name.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('Name is required');   
+    }
+
+    //validation for date
+    if(!date|| date.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('Date is required');    
+    }
+
+    let sqldate = `INSERT INTO ChangeAvailability (Date) VALUES ("${date}")`;
+            let querydate = db.query(sqldate,(err, result) => {
+                if(err) throw err;
+                console.log(result);
+                return res.send('Change Availability Sucessfully.')
+            });
+});
+
+
 app.listen('3000',()=>{
     console.log("Server started on port 3000...")
 })
