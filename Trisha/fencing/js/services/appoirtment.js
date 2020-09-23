@@ -21,7 +21,7 @@ module.exports = async (options) => {
         to: options.email, // Example to send multiple email id
         subject: options.subject,
         text: `<YOUR TEXT_CONTENT_GOES_HERE>`,
-        html: `<b><h2> Hey ${options.name}, </b><br> <h3>Your Appoirtment is booked Sucessfully.<br><strong style="color: red;"> Date : ${options.date}<br> <strong style="color: blue;"> Time : ${options.time} ${options.TT} </strong> <br>
+        html: `<b><h2> Hey ${options.name}, </b><br> <h3>Your Appoirtment is booked Sucessfully.<br><strong style="color: red;"> Date : ${options.date}<br> <strong style="color: blue;"> Time : ${options.time} ${options.TT} </strong><br> <strong style="color: blue;"> Location : 12 ROYALPALM DRIVE, Parafield Gardens, SA 5107, Australia</strong> <br>
         <h4> Thanks and Regards, <h4>
         <h4> Tisha Fencing <h4>`,
         // attachments: [                       // OPTIONAL ATTCHMENTS
