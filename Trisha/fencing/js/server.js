@@ -239,7 +239,7 @@ app.post('/resetpassword', (req,res) => {
         let queryPassword = db.query(sqlPassword,(err, result) => {
             if(err) throw err;
             console.log(result);
-           return res.send('Your Password Reset Sucessfully.');
+           return res.send('Your Password Reset Sucessfully!! Now you can Sign in..');
         });
     }); //query reset
   }); //query email end
@@ -282,6 +282,13 @@ app.post('/appoirtment', async (req, res) => {
         //400 Bad Request
         return res.status(400).send('Time is required');
     }
+
+    let sqlDateDisable = 'SELECT * from ChangeAvailability';
+        let queryDateDisable = db.query(sqlDateDisable, (err, result) => {
+                if(err) throw err;
+                console.log(result);
+                return res.send('Please Select Another Date.')
+        });
 
     let sqlDateTime = `SELECT * from Book WHERE Date = "${date}" AND Time = "${time}"`;
     let occupied = false;
