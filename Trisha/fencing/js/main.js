@@ -166,7 +166,15 @@ function signin()
         };
         
         $.ajax(settings).done(function (response) {
-            return alert (response);
+            //return alert (response);
+            if(response != "Incorrect email or password!!!")
+            {
+                window.location = "file:///Users/harsh/Desktop/course_harsh/projects/Tisha-Fencing/Trisha/fencing/website/booking/quote.html"
+            }
+            else
+            {
+                return alert (response);
+            }
         });
         //   $(document).ajaxStop(function(){
         //     window.location.reload();
@@ -366,3 +374,4 @@ function change()
         return;
       });
 }
+
