@@ -7,6 +7,10 @@ const app = express();
 const emailSvc = require('./services/email'); 
 const { realpathSync } = require('fs');
 const appoirtmentEmailSvc = require('./services/appoirtment'); 
+const queryEmailSvc = require('./services/query'); 
+const multer  = require('multer')
+const upload = multer({ dest: 'uploads/' })
+const fs = require('fs');
 
 app.use(bodyparser.urlencoded({extended : true}));
 app.use(bodyparser.json());
@@ -283,12 +287,12 @@ app.post('/appoirtment', async (req, res) => {
         return res.status(400).send('Time is required');
     }
 
-    let sqlDateDisable = 'SELECT * from ChangeAvailability';
-        let queryDateDisable = db.query(sqlDateDisable, (err, result) => {
-                if(err) throw err;
-                console.log(result);
-                return res.send('Please Select Another Date.')
-        });
+    // let sqlDateDisable = 'SELECT * from ChangeAvailability';
+    //     let queryDateDisable = db.query(sqlDateDisable, (err, result) => {
+    //             if(err) throw err;
+    //             console.log(result);
+    //             return res.send('Please Select Another Date.')
+    //     });
 
     let sqlDateTime = `SELECT * from Book WHERE Date = "${date}" AND Time = "${time}"`;
     let occupied = false;
@@ -361,6 +365,127 @@ app.post('/Changeavailability', (req,res) => {
                 return res.send('Change Availability Sucessfully.')
             });
 });
+
+//Send Query
+app.post('/query', (req,res) => {
+    const name = req.body.name;
+    const email = req.body.email;
+    const que = req.body.que;
+
+    //Validation for email
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if (!email || email.length>254 || !valid)
+    {
+        res.status(400).send('Enter Valid email address');
+        return;
+    }
+
+    //validation for Name
+    if(!name|| name.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('Name is required');   
+    }
+    if(!que|| que.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('Question is required');   
+    }
+
+    let sql = `INSERT INTO Query (Name, Email, Question) VALUES ("${name}", "${email}", "${que}")`;
+            let query = db.query(sql,(err, result) => {
+                if(err) throw err;
+                console.log(result);
+                //return res.send('Send Query Sucessfully.')
+            });
+            const emailOptions = {email : email, name: name , que: que , subject : 'Customer Query'}
+            queryEmailSvc(emailOptions).then((sucess) => {
+                return res.send('Your Query Send Sucessfully.');
+            }).catch((err) => {
+                return res.status(500).send({"Error": err})
+            })    
+})
+
+//Admin change design page
+app.post('/admin', (req,res) => {
+    const design = req.body.design;
+
+    let sql = `SELECT * from Admin WHERE designName = "${design}"`;
+
+    let query = db.query(sql,(err, result) => {
+        if(err || !result.length > 0)
+        {
+            res.send('No Records found');
+            return;
+            //throw err;
+        }
+        // const base = new Buffer(result.image).toString('base64');
+        console.log(result);
+        return res.send(result);
+    })
+})
+
+//update admin 
+app.post('/update', (req,res)=> {
+    const design = req.body.design;
+    const name = req.body.name;
+    const content = req.body.content;
+    //const img = req.body.img;
+
+    // const base = new Buffer(img).toString('base64');
+    // console.log(base);
+    //validation for Name
+    if(!name|| name.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('title is required');   
+    }
+    if(!content|| content.length < 0 )
+    {
+        //400 Bad Request
+        return res.status(400).send('content is required');   
+    }
+
+    let sql = `UPDATE Admin SET title= "${name}", content= "${content}" WHERE  designName = "${design}"`;
+
+    let query = db.query(sql,(err, result) => {
+        if(err) throw err;
+        console.log(result);
+       return res.send('Data Updated Sucessfully!!');
+    });
+})
+
+//update Image
+// app.post('/fileUpload', upload.single('image'), (req, res, next) => {
+//     const design = req.body.design;
+//     const img = req.file.buffer;
+    //console.log('file' + req.file);
+    //const byte = fs.readFileSync(req.file);
+    //const encoded = Buffer.from(byte).toString('base64');
+    //console.log("base" + encoded)
+
+//     let sql = `UPDATE Admin SET image= "${img}" WHERE  designName = "${design}"`;
+
+//     let query = db.query(sql,(err, result) => {
+//         if(err) throw err;
+//         console.log(result);
+//        return res.send('Image Updated Sucessfully!!');
+//     });
+
+//   })
+  
+  //Fetch data of designs
+  app.post('/fetchdesign', (req,res) => {
+      let sql = 'SELECT * FROM Admin';
+
+      let query = db.query(sql,(err, result) => {
+        if(err) throw err;
+        console.log(result);
+        return res.send(result);     
+      })
+  })
+
 
 
 app.listen('3000',()=>{
