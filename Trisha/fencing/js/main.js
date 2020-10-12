@@ -138,7 +138,7 @@ function signup()
     }
 }
 
-//Sign in
+//user Sign in
 function signin()
 {
     var email = document.getElementById("email").value;
@@ -170,6 +170,50 @@ function signin()
             if(response != "Incorrect email or password!!!")
             {
                 window.location = "file:///Users/harsh/Desktop/course_harsh/projects/Tisha-Fencing/Trisha/fencing/website/booking/quote.html"
+            }
+            else
+            {
+                return alert (response);
+            }
+        });
+        //   $(document).ajaxStop(function(){
+        //     window.location.reload();
+        //   });
+    }
+}
+
+//Admin Sign in
+function adminsignin()
+{
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+
+    if(email == "" || password == "")
+    {
+        return alert("Enter Values in the field");
+    }
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if(!valid)
+    {
+       return alert("Enter valid Email");
+    }
+    else
+    {
+        var settings = {
+            "url": "http://localhost:3000/signin",
+            "method": "POST",
+            "headers": {
+            "Content-Type": "application/json"
+            },
+            "data": JSON.stringify({"email": email,"password": password}),
+        };
+        
+        $.ajax(settings).done(function (response) {
+            //return alert (response);
+            if(response != "Incorrect email or password!!!")
+            {
+                window.location = "file:///Users/harsh/Desktop/course_harsh/projects/Tisha-Fencing/Trisha/fencing/website/booking/admin.html"
             }
             else
             {
@@ -375,3 +419,37 @@ function change()
       });
 }
 
+//Customer Query
+function query()
+{
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var question = document.getElementById("question").value;
+    if(name == "" || email == "" || question == "")
+    {
+       return alert("Enter Values in the field");
+    }
+    var emailRegex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    var valid = emailRegex.test(email);
+    if(!valid)
+    {
+       return alert("Enter valid Email");
+    } 
+
+    var settings = {
+        "url": "http://localhost:3000/query",
+        "method": "POST",
+        "timeout": 0,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "data": JSON.stringify({"name":name,"email":email,"que":question}),
+      };
+      
+      $.ajax(settings).done(function (response) {
+        //console.log(response);
+        alert(response);
+        window.location.reload();
+        return;
+      });
+}
